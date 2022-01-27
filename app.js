@@ -33,7 +33,8 @@ const retornarPeliculas = ( peliculas ) => {
 			const $title = e.target.parentElement.children[1].textContent,
 			$img = e.target.parentElement.children[0].src,
 			$div = d.createElement('div');
-			let peli;
+			let peli,
+			popularidad;
 		
 			
 			console.log($title, $img);
@@ -44,6 +45,7 @@ const retornarPeliculas = ( peliculas ) => {
 			peliculas.results.forEach(ele => {
 				if(ele.title === $title){
 					peli = ele.overview;
+					popularidad = ele.populatity;
 				}
 			});
 
@@ -53,6 +55,9 @@ const retornarPeliculas = ( peliculas ) => {
 					<header><a href="#" class="btn-close">X</a></header>
 					<h2 class="card-title">${$title}</h2>
 					<img class="card-img"src="${$img}">
+					<div class="card-icons">
+					<a>${popularity/1000}</a><span class="card-icon"><i class="fas fa-star"></i></span>
+					</div>
 					<p>
 						${peli}
 					</p>
