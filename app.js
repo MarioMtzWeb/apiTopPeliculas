@@ -1,162 +1,145 @@
 'use strict';
 
 let pagina = 1;
-const btnAnterior = document.getElementById('btnAnterior'),btnSiguiente = document.getElementById('btnSiguiente'),
-$divContador = document.querySelector('.contadorPag'), d = document,
+let db;
+const d = document,
+btnAnterior = d.getElementById('btnAnterior'),
+btnSiguiente = d.getElementById('btnSiguiente'),
+$divContador = d.querySelector('.contadorPag'),
 $contenedorGlobal = d.querySelector('.container-global');
 
-btnSiguiente.addEventListener('click', () => {
+const API = `https://api.themoviedb.org/3/movie/popular?api_key=192e0b9821564f26f52949758ea3c473&language=es-MX&page=`;
+
+const incrementPage = () => {
 	if(pagina < 10){
-		pagina += 1;
-		cargarPeliculas();
+		pagina++;
+		renderMovies(getData(API,pagina));
+		renderPag();
 	}
-	$divContador.textContent = `Pag: ${pagina}`;
-});
-
-btnAnterior.addEventListener('click', () => {
+};
+const decrementPage = () => {
 	if(pagina > 1){
-		pagina -= 1;
-		cargarPeliculas();
+		pagina--;
+		renderMovies(getData(API,pagina));
+		renderPag();
 	}
-	$divContador.textContent = `Pag: ${pagina}`;
-});
+};
+
+const renderModal = (movie) => {
+
+	const $cardModal = d.createElement('div'),
+	$btnClose = d.createElement('button'),
+	$h3 = d.createElement('h3'),
+	$img = d.createElement('img'),
+	$p = d.createElement('p');
+	$cardModal.classList.add('card-modal');
+	$btnClose.classList.add('card-modal-btn');
+	$img.classList.add('card-modal-img');
+
+	$h3.textContent = movie.title;
+	$img.src = `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`;
+	$p.textContent = movie.overview || 'No tiene sinopsis';
+	$btnClose.textContent = 'X';
+	$cardModal.appendChild($h3);
+	$cardModal.appendChild($img);
+	$cardModal.appendChild($p);
+	$cardModal.appendChild($btnClose);
 
 
-const retornarPeliculas = ( peliculas ) => {
+	d.querySelector('.modal').innerHTML = '';
+	d.querySelector('.modal').appendChild($cardModal);
+	d.querySelector('.modal').classList.remove('none');
+	d.querySelector('.modal').classList.add('is-visible');
 
-	console.log(peliculas.results);
+};
 
-	d.addEventListener('click', e => {
+const searchMovie = (id, db) => {
 
-		if(e.target.matches('.pelicula *')){
-			
-			const $title = e.target.parentElement.children[1].textContent,
-			$img = e.target.parentElement.children[0].src,
-			$div = d.createElement('div');
-			let peli,
-			popularidad;
+	let movie = db.filter(movie => movie.id === Number(id));
+
+	renderModal(movie[0]);
+}
+
+const renderPag = () => {
+
+	d.querySelector('.contadorPag').textContent = `Pag: ${pagina}`;
+};
+
+const renderMovies = async (data) => {
+	try {	
 		
-			
-			console.log($title, $img);
+		let $fragment = d.createDocumentFragment();
+		
+		let arr = await data;
 
-			$div.classList.add('modal');
-			$contenedorGlobal.appendChild($div);
-
-			peliculas.results.forEach(ele => {
-				if(ele.title === $title){
-					peli = ele.overview;
-					popularidad = ele.populatity;
-				}
-			});
-
-
-			$div.innerHTML = `
-				<div class="modal-card">
-					<header><a href="#" class="btn-close">X</a></header>
-					<h2 class="card-title">${$title}</h2>
-					<img class="card-img"src="${$img}">
-					<div class="card-icons">
-					<a>${popularity/1000}</a><span class="card-icon"><i class="fas fa-star"></i></span>
-					</div>
-					<p>
-						${peli}
-					</p>
-				</div>
-			`;
-		};
-
-		if(e.target.matches('.btn-close')){
-			e.preventDefault();
-			//console.log(e.target);
-			d.querySelector('.modal').remove();
-		}
-
-	});
-}
-
-
-const cargarPeliculas = async() => {
-	try {
-		const respuesta = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=192e0b9821564f26f52949758ea3c473&language=es-MX&page=${pagina}`);
+		db = arr;
 	
-		//console.log(respuesta);
+		arr.forEach( movie => {
+			const $div = d.createElement('div');
+			const $h4 = d.createElement('h4')
+			const $img = d.createElement('img')
+			$div.classList.add('card');
+			$img.classList.add('card-img');
+			$img.dataset.id = movie.id;
+			$h4.innerText = movie.title;
+			$img.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
 
-		// Si la respuesta es correcta
-		if(respuesta.status === 200){
-			const datos = await respuesta.json();
+			$div.appendChild($h4)
+			$div.appendChild($img)
 
-			retornarPeliculas(datos);
-
-			let peliculas = '';
-			datos.results.forEach(pelicula => {
-				//console.log(pelicula);
-				peliculas += `
-				<div class="pelicula">
-				<img class="poster" src="https://image.tmdb.org/t/p/w500/${pelicula.poster_path}">
-				<h3 class="titulo">${pelicula.title}</h3>
-				</div>
-				`;
-			});
-
-			d.querySelector('.contenedor').innerHTML = peliculas;
-			
-
-			console.log(pagina);
-
-		} else if(respuesta.status === 401){
-			console.log('Pusiste la llave mal');
-		} else if(respuesta.status === 404){
-			console.log('La pelicula que buscas no existe');
-		} else {
-			console.log('Hubo un error y no sabemos que paso');
-		}
-
-	} catch(error){
-		console.log(error);
-	}
-
-}
-
-cargarPeliculas();
-
-$divContador.textContent = `Pag: ${pagina}`;
-
-/* d.addEventListener('click', e =>{
-	//console.log(datos);
-	
-	if(e.target.matches('.pelicula img')){
-		let namePeli = e.target.parentElement.children[1].textContent,
-		imgPeli = e.target.parentElement.children[0].src,
-		peli; 
-		//console.log(e.target.parentElement.children[1].textContent);
-		const $div = d.createElement('div'); 
-		$div.classList.add('modal');
-		$contenedorGlobal.appendChild($div);
-
-		datos.results.forEach(ele => {
-			if(ele.title === namePeli){
-				peli = ele.overview;
-			}
+			$fragment.appendChild($div);
 		});
 
-		//console.log(peli);
+		d.querySelector('.contenedor').innerHTML = '';
+		d.querySelector('.contenedor').appendChild($fragment);
 
-		$div.innerHTML = `
-			<div class="modal-card">
-				<header><a href="#" class="btn-close">X</a></header>
-				<h2 class="card-title">${namePeli}</h2>
-				<img class="card-img"src="${imgPeli}">
-				<p>
-					${peli}
-				</p>
-			</div>
-		`;
-	};
+	} catch (err) {
 
-	if(e.target.matches('.btn-close')){
-		e.preventDefault();
-		//console.log(e.target);
-		d.querySelector('.modal').remove();
+		console.log(err);
 	}
-}); */
+}
+
+const getData = async (url, page) => {
+	try {
+		
+		let data = await fetch(`${url}${page}`);
+		
+		if(!data.ok){
+			throw data;
+		}
+		let res = await data.json();
+
+		return res.results;
+	} catch (err){
+		
+		console.log(err);
+		let message = err.statusText || 'Ocurro un error';
+
+		console.error(`Error ${err.status} : ${message}`);
+	}
+};
+
+renderMovies(getData(API,pagina));
+renderPag();
+
+d.addEventListener('click', e => {
+
+	if(e.target === btnSiguiente){
+		incrementPage();
+	}
+	if(e.target === btnAnterior){
+		decrementPage();
+	}
+	if(e.target.matches('.card-img')){
+		let id = e.target.dataset.id;
+		searchMovie(id, db);
+	}
+	if(e.target.matches('.card-modal-btn') || e.target.matches('.modal')){
+		d.querySelector('.card-modal').remove();
+		d.querySelector('.modal').classList.remove('is-visible');
+		d.querySelector('.modal').classList.add('none');
+
+	}
+});
+
 
