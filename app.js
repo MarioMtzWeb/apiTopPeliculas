@@ -27,21 +27,42 @@ const decrementPage = () => {
 
 const renderModal = (movie) => {
 
+	console.log(movie);
+
 	const $cardModal = d.createElement('div'),
 	$btnClose = d.createElement('button'),
 	$h3 = d.createElement('h3'),
 	$img = d.createElement('img'),
+	$box = d.createElement('div'),
 	$p = d.createElement('p');
 	$cardModal.classList.add('card-modal');
+	$h3.classList.add('card-modal-title');
 	$btnClose.classList.add('card-modal-btn');
+	$box.classList.add('card-modal-box');
 	$img.classList.add('card-modal-img');
+	$p.classList.add('card-modal-p');
 
 	$h3.textContent = movie.title;
 	$img.src = `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`;
-	$p.textContent = movie.overview || 'No tiene sinopsis';
+	$box.innerHTML = `
+		<div>
+			<p>
+				Estreno: <span class="date-modal">${movie.release_date}</span>
+			</p>
+		</div>
+		<div class="box-vote">
+			<i class="fa-solid fa-star icon-vote"></i>
+			<p>
+				${movie.vote_average}
+			</p>
+		</div>
+	`;
+	$p.textContent = movie.overview || 'Sin sinopsis';
+
 	$btnClose.textContent = 'X';
 	$cardModal.appendChild($h3);
 	$cardModal.appendChild($img);
+	$cardModal.appendChild($box);
 	$cardModal.appendChild($p);
 	$cardModal.appendChild($btnClose);
 
@@ -138,7 +159,6 @@ d.addEventListener('click', e => {
 		d.querySelector('.card-modal').remove();
 		d.querySelector('.modal').classList.remove('is-visible');
 		d.querySelector('.modal').classList.add('none');
-
 	}
 });
 

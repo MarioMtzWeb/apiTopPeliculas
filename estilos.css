@@ -95,19 +95,50 @@ body {
 	padding: 1rem;
 	background-color: #fff;
 }
+.card-modal-title{
+	font-size: 1.5rem;
+}
+.card-modal-box {
+	width: 50%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem;
+	font-size: 1.2rem;
+}
+.box-vote {
+	display: flex;
 
+}
+.icon-vote{
+	color: yellow;
+}
+.card-modal-box p {
+	margin: 0;
+}
+.date-modal{
+	font-weight: lighter;
+}
+.card-modal-p{
+	margin: 0;
+	padding: 0 1rem;
+}
 .card-modal-btn {
 	width: 30px;
 	height: 30px;
 	position: absolute;
-	top: 1px;
-	right: 1px;
+	top: 5px;
+	right: 5px;
 	font-size: 1rem;
 	font-weight: bolder;
 	background-color: #fff;
 	color: #f00;
 	border: thin solid #f00;
 	cursor: pointer;
+}
+.card-modal-btn:hover {
+	background-color: #f00;
+	color: #fff;
 }
 .paginacion {
 	position: fixed;
@@ -137,12 +168,9 @@ body {
 	transition: .3s ease all;
 }
 
-
 .paginacion button:hover {
 	background: #137c32;
 }
-
-
 
 @media (max-width: 768px) {
 	.contenedor{
@@ -150,6 +178,10 @@ body {
 	}
 	.paginacion button{
 		font-size:1.2rem;
+	}
+	.card-modal-box {
+		width:100%;
+		font-size: 1rem;
 	}
 }
 @media (max-width: 500px) {
